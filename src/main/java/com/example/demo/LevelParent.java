@@ -29,9 +29,10 @@ public abstract class LevelParent extends Observable {
 	private final List<ActiveActorDestructible> enemyUnits;
 	private final List<ActiveActorDestructible> userProjectiles;
 	private final List<ActiveActorDestructible> enemyProjectiles;
-	
+
 	private int currentNumberOfEnemies;
 	private LevelView levelView;
+	private boolean levelCompleted = false;
 
 	public LevelParent(String backgroundImageName, double screenHeight, double screenWidth, int playerInitialHealth) {
 		this.root = new Group();
@@ -61,6 +62,14 @@ public abstract class LevelParent extends Observable {
 
 	protected abstract LevelView instantiateLevelView();
 
+	protected boolean isLevelCompleted() {
+		return levelCompleted;
+	}
+
+	protected void setLevelCompleted(boolean completed) {
+		this.levelCompleted = completed;
+	}
+
 	public Scene initializeScene() {
 		initializeBackground();
 		initializeFriendlyUnits();
@@ -73,11 +82,21 @@ public abstract class LevelParent extends Observable {
 		timeline.play();
 	}
 
-	public void goToNextLevel(String levelName) {
-		setChanged();
-		notifyObservers(levelName);
-	}
+	// public void goToNextLevel(String levelName) {
+	// 	setChanged();
+	// 	notifyObservers(levelName);
+	// }
 
+	public void goToNextLevel(String levelName) {
+		if (!isLevelCompleted()) {
+			setChanged();
+			notifyObservers(levelName);
+		}
+	}
+	/*
+		is called on every iteration of the game loop
+		which typically runs at a fixed interval, such as every 16 milliseconds (approximately 60 frames per second).
+	*/
 	private void updateScene() {
 		spawnEnemyUnits();
 		updateActors();
@@ -171,10 +190,11 @@ public abstract class LevelParent extends Observable {
 	}
 
 	private void handleCollisions(List<ActiveActorDestructible> actors1,
-			List<ActiveActorDestructible> actors2) {
+								  List<ActiveActorDestructible> actors2) {
 		for (ActiveActorDestructible actor : actors2) {
 			for (ActiveActorDestructible otherActor : actors1) {
 				if (actor.getBoundsInParent().intersects(otherActor.getBoundsInParent())) {
+					System.out.println("a Collision has happened between the fghter plane and the projectile ");
 					actor.takeDamage();
 					otherActor.takeDamage();
 				}
@@ -208,11 +228,13 @@ public abstract class LevelParent extends Observable {
 	protected void winGame() {
 		timeline.stop();
 		levelView.showWinImage();
+
 	}
 
 	protected void loseGame() {
 		timeline.stop();
 		levelView.showGameOverImage();
+
 	}
 
 	protected UserPlane getUser() {
