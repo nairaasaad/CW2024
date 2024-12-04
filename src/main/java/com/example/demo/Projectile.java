@@ -15,3 +15,6 @@ public abstract class Projectile extends ActiveActorDestructible {
 	public abstract void updatePosition();
 
 }
+
+
+
