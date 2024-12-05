@@ -7,7 +7,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class MainMenu {
-    private static final String BACKGROUND_IMAGE_PATH = "/com/example/demo/images/MenuBackground.jpg";
+
     private static final int SCREEN_WIDTH = 1300;
     private static final int SCREEN_HEIGHT = 750;
     private final Stage stage;
@@ -33,7 +33,6 @@ public class MainMenu {
         startButton.setOnAction(e -> startGame());
         optionsButton.setOnAction(e -> showOptions());
         exitButton.setOnAction(e -> stage.close());
-
 
         menuLayout.getChildren().addAll(startButton, optionsButton, exitButton);
 
