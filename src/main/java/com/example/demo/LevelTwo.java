@@ -39,6 +39,8 @@ public class LevelTwo extends LevelParent {
 		}
 	}
 
+
+
 	@Override
 	protected void spawnEnemyUnits() {
 		if (getCurrentNumberOfEnemies() == 0) {
