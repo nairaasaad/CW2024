@@ -18,35 +18,46 @@ public class MainMenu {
 
     public void showMenu() {
         VBox menuLayout = new VBox(20);
-        menuLayout.setStyle("-fx-alignment: center; -fx-padding: 20; -fx-background-color: #2c3e50;");
+        menuLayout.setStyle("-fx-alignment: center; -fx-padding: 20;");
+
+        // Use JavaFX URL-style path for the background image
+        String imagePath = getClass().getResource("/com/example/demo/images/menubackground.jpg").toExternalForm();
+        menuLayout.setStyle(
+                "-fx-alignment: center; -fx-padding: 20; " +
+                        "-fx-background-image: url('" + imagePath + "'); " +
+                        "-fx-background-size: cover;"
+        );
 
         Button startButton = new Button("Start");
         Button optionsButton = new Button("Options");
-        Button exitButton = new Button("Exit");
+        Button quitButton = new Button("Quit");
 
         // Style buttons
         styleButton(startButton);
         styleButton(optionsButton);
-        styleButton(exitButton);
+        styleButton(quitButton);
 
         // Button actions
         startButton.setOnAction(e -> startGame());
         optionsButton.setOnAction(e -> showOptions());
-        exitButton.setOnAction(e -> stage.close());
+        quitButton.setOnAction(e -> stage.close());
 
-        menuLayout.getChildren().addAll(startButton, optionsButton, exitButton);
+        menuLayout.getChildren().addAll(startButton, optionsButton, quitButton);
 
         Scene mainMenuScene = new Scene(menuLayout, SCREEN_WIDTH, SCREEN_HEIGHT);
         stage.setScene(mainMenuScene);
         stage.show();
     }
 
+
     private void styleButton(Button button) {
         button.setStyle(
-                "-fx-font-size: 16px; -fx-padding: 10 20; -fx-background-color: #34495e; -fx-text-fill: white;"
+                "-fx-font-size: 24px; -fx-padding: 20 40; -fx-background-color: #34495e; -fx-text-fill: white;"
         );
-        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #1abc9c; -fx-text-fill: black;"));
-        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #34495e; -fx-text-fill: white;"));
+
+
+        button.setOnMouseEntered(e -> button.setStyle("-fx-font-size: 24px; -fx-padding: 20 40; -fx-background-color: #1abc9c; -fx-text-fill: black;"));
+        button.setOnMouseExited(e -> button.setStyle("-fx-font-size: 24px; -fx-padding: 20 40; -fx-background-color: #34495e; -fx-text-fill: white;"));
     }
 
     private void startGame() {
@@ -60,6 +71,6 @@ public class MainMenu {
 
     private void showOptions() {
         System.out.println("Options menu coming soon...");
-        // Add code to display an options menu scene if needed
+
     }
 }
