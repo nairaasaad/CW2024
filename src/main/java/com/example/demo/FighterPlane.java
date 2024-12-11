@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import com.example.demo.Actor.ActiveActorDestructible;
+
 public abstract class FighterPlane extends ActiveActorDestructible {
 
 	private int health;
@@ -10,7 +12,7 @@ public abstract class FighterPlane extends ActiveActorDestructible {
 	}
 
 	public abstract ActiveActorDestructible fireProjectile();
-	
+
 	@Override
 	public void takeDamage() {
 		health--;
@@ -34,5 +36,5 @@ public abstract class FighterPlane extends ActiveActorDestructible {
 	public int getHealth() {
 		return health;
 	}
-		
+
 }

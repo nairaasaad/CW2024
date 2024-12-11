@@ -3,6 +3,8 @@ package com.example.demo;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import User.UserPlane;
+import com.example.demo.Actor.ActiveActorDestructible;
 import javafx.animation.*;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -25,13 +27,15 @@ public abstract class LevelParent extends Observable {
 	private final Scene scene;
 	private final ImageView background;
 
+
 	private final List<ActiveActorDestructible> friendlyUnits;
 	private final List<ActiveActorDestructible> enemyUnits;
 	private final List<ActiveActorDestructible> userProjectiles;
 	private final List<ActiveActorDestructible> enemyProjectiles;
-	
+
 	private int currentNumberOfEnemies;
 	private LevelView levelView;
+	private boolean levelCompleted = false;
 
 	public LevelParent(String backgroundImageName, double screenHeight, double screenWidth, int playerInitialHealth) {
 		this.root = new Group();
@@ -51,6 +55,9 @@ public abstract class LevelParent extends Observable {
 		this.currentNumberOfEnemies = 0;
 		initializeTimeline();
 		friendlyUnits.add(user);
+		PauseMenu pauseMenu = new PauseMenu(root, scene);
+		pauseMenu.initializePauseHandler(this);
+
 	}
 
 	protected abstract void initializeFriendlyUnits();
@@ -60,6 +67,14 @@ public abstract class LevelParent extends Observable {
 	protected abstract void spawnEnemyUnits();
 
 	protected abstract LevelView instantiateLevelView();
+
+	protected boolean isLevelCompleted() {
+		return levelCompleted;
+	}
+
+	protected void setLevelCompleted() {
+		this.levelCompleted = true;
+	}
 
 	public Scene initializeScene() {
 		initializeBackground();
@@ -73,12 +88,25 @@ public abstract class LevelParent extends Observable {
 		timeline.play();
 	}
 
-	public void goToNextLevel(String levelName) {
-		setChanged();
-		notifyObservers(levelName);
+	public void stopTimeline() {
+		timeline.stop();
 	}
 
-	private void updateScene() {
+	public void startTimeline() {
+		timeline.play();
+	}
+
+	public void goToNextLevel(String levelName) {
+		if (!isLevelCompleted()) {
+			setChanged();
+			notifyObservers(levelName);
+		}
+	}
+	/*
+		is called on every iteration of the game loop
+		which typically runs at a fixed interval, such as every 16 milliseconds (approximately 60 frames per second).
+	*/
+	protected void updateScene() {
 		spawnEnemyUnits();
 		updateActors();
 		generateEnemyFire();
@@ -109,12 +137,15 @@ public abstract class LevelParent extends Observable {
 				if (kc == KeyCode.UP) user.moveUp();
 				if (kc == KeyCode.DOWN) user.moveDown();
 				if (kc == KeyCode.SPACE) fireProjectile();
+				if (kc == KeyCode.RIGHT) user.moveForward();
+				if (kc == KeyCode.LEFT) user.moveBackward();
 			}
 		});
 		background.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent e) {
 				KeyCode kc = e.getCode();
-				if (kc == KeyCode.UP || kc == KeyCode.DOWN) user.stop();
+				if (kc == KeyCode.UP || kc == KeyCode.DOWN) user.stopVerticalMovement();
+				if (kc == KeyCode.LEFT || kc == KeyCode.RIGHT) user.stopHorizontalMovement();
 			}
 		});
 		root.getChildren().add(background);
@@ -138,10 +169,10 @@ public abstract class LevelParent extends Observable {
 	}
 
 	private void updateActors() {
-		friendlyUnits.forEach(plane -> plane.updateActor());
-		enemyUnits.forEach(enemy -> enemy.updateActor());
+		friendlyUnits.forEach(ActiveActorDestructible::updateActor);
+		enemyUnits.forEach(ActiveActorDestructible::updateActor);
 		userProjectiles.forEach(projectile -> projectile.updateActor());
-		enemyProjectiles.forEach(projectile -> projectile.updateActor());
+		enemyProjectiles.forEach(ActiveActorDestructible::updateActor);
 	}
 
 	private void removeAllDestroyedActors() {
@@ -152,7 +183,7 @@ public abstract class LevelParent extends Observable {
 	}
 
 	private void removeDestroyedActors(List<ActiveActorDestructible> actors) {
-		List<ActiveActorDestructible> destroyedActors = actors.stream().filter(actor -> actor.isDestroyed())
+		List<ActiveActorDestructible> destroyedActors = actors.stream().filter(ActiveActorDestructible::isDestroyed)
 				.collect(Collectors.toList());
 		root.getChildren().removeAll(destroyedActors);
 		actors.removeAll(destroyedActors);
@@ -171,10 +202,11 @@ public abstract class LevelParent extends Observable {
 	}
 
 	private void handleCollisions(List<ActiveActorDestructible> actors1,
-			List<ActiveActorDestructible> actors2) {
+								  List<ActiveActorDestructible> actors2) {
 		for (ActiveActorDestructible actor : actors2) {
 			for (ActiveActorDestructible otherActor : actors1) {
 				if (actor.getBoundsInParent().intersects(otherActor.getBoundsInParent())) {
+					System.out.println("a Collision has happened between the fighter plane and the projectile ");
 					actor.takeDamage();
 					otherActor.takeDamage();
 				}
@@ -208,11 +240,13 @@ public abstract class LevelParent extends Observable {
 	protected void winGame() {
 		timeline.stop();
 		levelView.showWinImage();
+
 	}
 
 	protected void loseGame() {
 		timeline.stop();
 		levelView.showGameOverImage();
+
 	}
 
 	protected UserPlane getUser() {
@@ -246,6 +280,14 @@ public abstract class LevelParent extends Observable {
 
 	private void updateNumberOfEnemies() {
 		currentNumberOfEnemies = enemyUnits.size();
+	}
+	protected boolean isEnemyPlaneOverlapping(ActiveActorDestructible newEnemy) {
+		for (ActiveActorDestructible enemy : enemyUnits) {
+			if (newEnemy.getBoundsInParent().intersects(enemy.getBoundsInParent())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
