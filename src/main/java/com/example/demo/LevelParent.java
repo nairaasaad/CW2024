@@ -47,7 +47,7 @@ public abstract class LevelParent extends Observable {
 		this.userProjectiles = new ArrayList<>();
 		this.enemyProjectiles = new ArrayList<>();
 
-		this.background = new ImageView(new Image(getClass().getResource(backgroundImageName).toExternalForm()));
+		this.background = new ImageView(new Image(Objects.requireNonNull(getClass().getResource(backgroundImageName)).toExternalForm()));
 		this.screenHeight = screenHeight;
 		this.screenWidth = screenWidth;
 		this.enemyMaximumYPosition = screenHeight - SCREEN_HEIGHT_ADJUSTMENT;
@@ -171,7 +171,7 @@ public abstract class LevelParent extends Observable {
 	private void updateActors() {
 		friendlyUnits.forEach(ActiveActorDestructible::updateActor);
 		enemyUnits.forEach(ActiveActorDestructible::updateActor);
-		userProjectiles.forEach(projectile -> projectile.updateActor());
+		userProjectiles.forEach(ActiveActorDestructible::updateActor);
 		enemyProjectiles.forEach(ActiveActorDestructible::updateActor);
 	}
 
@@ -184,7 +184,7 @@ public abstract class LevelParent extends Observable {
 
 	private void removeDestroyedActors(List<ActiveActorDestructible> actors) {
 		List<ActiveActorDestructible> destroyedActors = actors.stream().filter(ActiveActorDestructible::isDestroyed)
-				.collect(Collectors.toList());
+				.toList();
 		root.getChildren().removeAll(destroyedActors);
 		actors.removeAll(destroyedActors);
 	}
@@ -205,8 +205,8 @@ public abstract class LevelParent extends Observable {
 								  List<ActiveActorDestructible> actors2) {
 		for (ActiveActorDestructible actor : actors2) {
 			for (ActiveActorDestructible otherActor : actors1) {
+				if (otherActor.isDestroyed()) continue;
 				if (actor.getBoundsInParent().intersects(otherActor.getBoundsInParent())) {
-					System.out.println("a Collision has happened between the fighter plane and the projectile ");
 					actor.takeDamage();
 					otherActor.takeDamage();
 				}
@@ -248,6 +248,7 @@ public abstract class LevelParent extends Observable {
 		levelView.showGameOverImage();
 
 	}
+
 
 	protected UserPlane getUser() {
 		return user;
