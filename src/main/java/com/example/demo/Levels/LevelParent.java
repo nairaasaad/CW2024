@@ -28,7 +28,6 @@ public abstract class LevelParent extends Observable {
 	private final Scene scene;
 	private final ImageView background;
 
-
 	private final List<ActiveActorDestructible> friendlyUnits;
 	private final List<ActiveActorDestructible> enemyUnits;
 	private final List<ActiveActorDestructible> userProjectiles;
@@ -58,7 +57,6 @@ public abstract class LevelParent extends Observable {
 		friendlyUnits.add(user);
 		PauseMenu pauseMenu = new PauseMenu(root, scene);
 		pauseMenu.initializePauseHandler(this);
-
 	}
 
 	protected abstract void initializeFriendlyUnits();
@@ -103,10 +101,7 @@ public abstract class LevelParent extends Observable {
 			notifyObservers(levelName);
 		}
 	}
-	/*
-		is called on every iteration of the game loop
-		which typically runs at a fixed interval, such as every 16 milliseconds (approximately 60 frames per second).
-	*/
+
 	protected void updateScene() {
 		spawnEnemyUnits();
 		updateActors();
@@ -132,24 +127,28 @@ public abstract class LevelParent extends Observable {
 		background.setFocusTraversable(true);
 		background.setFitHeight(screenHeight);
 		background.setFitWidth(screenWidth);
-		background.setOnKeyPressed(new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent e) {
-				KeyCode kc = e.getCode();
-				if (kc == KeyCode.UP) user.moveUp();
-				if (kc == KeyCode.DOWN) user.moveDown();
-				if (kc == KeyCode.SPACE) fireProjectile();
-				if (kc == KeyCode.RIGHT) user.moveForward();
-				if (kc == KeyCode.LEFT) user.moveBackward();
-			}
-		});
-		background.setOnKeyReleased(new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent e) {
-				KeyCode kc = e.getCode();
-				if (kc == KeyCode.UP || kc == KeyCode.DOWN) user.stopVerticalMovement();
-				if (kc == KeyCode.LEFT || kc == KeyCode.RIGHT) user.stopHorizontalMovement();
-			}
-		});
+		background.setOnKeyPressed(createKeyPressHandler());
+		background.setOnKeyReleased(createKeyReleaseHandler());
 		root.getChildren().add(background);
+	}
+
+	private EventHandler<KeyEvent> createKeyPressHandler() {
+		return e -> {
+			KeyCode kc = e.getCode();
+			if (kc == KeyCode.UP) user.moveUp();
+			if (kc == KeyCode.DOWN) user.moveDown();
+			if (kc == KeyCode.SPACE) fireProjectile();
+			if (kc == KeyCode.RIGHT) user.moveForward();
+			if (kc == KeyCode.LEFT) user.moveBackward();
+		};
+	}
+
+	private EventHandler<KeyEvent> createKeyReleaseHandler() {
+		return e -> {
+			KeyCode kc = e.getCode();
+			if (kc == KeyCode.UP || kc == KeyCode.DOWN) user.stopVerticalMovement();
+			if (kc == KeyCode.LEFT || kc == KeyCode.RIGHT) user.stopHorizontalMovement();
+		};
 	}
 
 	private void fireProjectile() {
@@ -184,7 +183,8 @@ public abstract class LevelParent extends Observable {
 	}
 
 	private void removeDestroyedActors(List<ActiveActorDestructible> actors) {
-		List<ActiveActorDestructible> destroyedActors = actors.stream().filter(ActiveActorDestructible::isDestroyed)
+		List<ActiveActorDestructible> destroyedActors = actors.stream()
+				.filter(ActiveActorDestructible::isDestroyed)
 				.toList();
 		root.getChildren().removeAll(destroyedActors);
 		actors.removeAll(destroyedActors);
@@ -202,27 +202,22 @@ public abstract class LevelParent extends Observable {
 		handleCollisions(enemyProjectiles, friendlyUnits);
 	}
 
-	private void handleCollisions(List<ActiveActorDestructible> actors1,
-								  List<ActiveActorDestructible> actors2) {
-		for (ActiveActorDestructible actor : actors2) {
-			for (ActiveActorDestructible otherActor : actors1) {
-				if (otherActor.isDestroyed()) continue;
-				if (actor.getBoundsInParent().intersects(otherActor.getBoundsInParent())) {
-					System.out.println("a Collision has happened between the fighter plane and the projectile ");
+	private void handleCollisions(List<ActiveActorDestructible> actors1, List<ActiveActorDestructible> actors2) {
+		actors2.forEach(actor -> actors1.stream()
+				.filter(otherActor -> !otherActor.isDestroyed() && actor.getBoundsInParent().intersects(otherActor.getBoundsInParent()))
+				.forEach(otherActor -> {
 					actor.takeDamage();
 					otherActor.takeDamage();
-				}
-			}
-		}
+				}));
 	}
 
 	private void handleEnemyPenetration() {
-		for (ActiveActorDestructible enemy : enemyUnits) {
+		enemyUnits.forEach(enemy -> {
 			if (enemyHasPenetratedDefenses(enemy)) {
 				user.takeDamage();
 				enemy.destroy();
 			}
-		}
+		});
 	}
 
 	private void updateLevelView() {
@@ -230,7 +225,8 @@ public abstract class LevelParent extends Observable {
 	}
 
 	private void updateKillCount() {
-		for (int i = 0; i < currentNumberOfEnemies - enemyUnits.size(); i++) {
+		int killedEnemies = currentNumberOfEnemies - enemyUnits.size();
+		for (int i = 0; i < killedEnemies; i++) {
 			user.incrementKillCount();
 		}
 	}
@@ -242,15 +238,12 @@ public abstract class LevelParent extends Observable {
 	protected void winGame() {
 		timeline.stop();
 		levelView.showWinImage();
-
 	}
 
 	protected void loseGame() {
 		timeline.stop();
 		levelView.showGameOverImage();
-
 	}
-
 
 	protected UserPlane getUser() {
 		return user;
@@ -284,13 +277,9 @@ public abstract class LevelParent extends Observable {
 	private void updateNumberOfEnemies() {
 		currentNumberOfEnemies = enemyUnits.size();
 	}
+
 	protected boolean isEnemyPlaneOverlapping(ActiveActorDestructible newEnemy) {
-		for (ActiveActorDestructible enemy : enemyUnits) {
-			if (newEnemy.getBoundsInParent().intersects(enemy.getBoundsInParent())) {
-				return true;
-			}
-		}
-		return false;
+		return enemyUnits.stream().anyMatch(enemy -> newEnemy.getBoundsInParent().intersects(enemy.getBoundsInParent()));
 	}
 
 }
