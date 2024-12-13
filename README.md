@@ -277,13 +277,7 @@ The `LevelView` class is responsible for managing the visual components of the g
   - The number of hearts to remove is now calculated by the difference between the current number of hearts and the hearts remaining.
 - **Purpose**: To provide more accurate heart removal based on the current state of the heart display, ensuring the UI properly reflects the player's health.
 
-### **4. Documentation and Comments**
-- **Original Class**: Sparse comments, minimal documentation of methods.
-- **Updated Class**: Methods now include JavaDoc comments to explain their purpose and parameters.
-  - For example, the constructor is now documented with a description of its parameters: `root` and `heartsToDisplay`.
-- **Purpose**: To improve code clarity and maintainability, especially for developers who may work on this class in the future.
-
-### **5. Refactoring of Constructor**
+### **4. Refactoring of Constructor**
 - **Original Constructor**: `root`, `heartsToDisplay` passed directly into the constructor and used without explanation.
 - **Updated Constructor**:
   - Additional explanation about the constructor's parameters.
@@ -293,14 +287,187 @@ The `LevelView` class is responsible for managing the visual components of the g
 ## Additional Changes
 - **General Refactoring**: The class now uses consistent method naming and structure to enhance readability and maintainability.
 - **Error Handling**: No changes have been made to error handling; however, the class is now better structured to handle specific UI display scenarios.
+- # LevelViewLevelTwo Class
+
+# LevelViewLevelTwo Class
+
+## Overview
+The `LevelViewLevelTwo` class is a subclass of the `LevelView` class, responsible for managing the specific visual elements for level two. In particular, it adds and manages the shield image for the boss unit, which is a key feature in the gameplay of this level.
+
+## Key Changes
+
+### **Package Declaration**
+- **Updated Package**: `com.example.demo.Levels`
+
+### **1. Shield Image Addition**
+- **Original Behavior**: The shield image was not included in the class.
+- **Updated Behavior**:
+  - The `ShieldImage` has been added as a level-specific element.
+  - The shield image is placed at a fixed position (`X = 1150`, `Y = 500`) on the screen.
+- **Purpose**: To visually represent the boss's shield in level two, which adds another layer of challenge and visual feedback to the player.
+
+### **2. Constructor**
+- **Original Constructor**: The `LevelViewLevelTwo` constructor was missing detailed documentation.
+- **Updated Constructor**:
+  - Now calls the `super(root, heartsToDisplay)` method to initialize inherited elements from the parent class `LevelView`.
+  - Adds the shield image to the root container via the `addImagesToRoot()` method.
+  - **Purpose**: To initialize the visual components specific to level two, including adding the shield image to the root Group.
+
+### **3. Method to Add Images to Root**
+- **Original Method**: No equivalent method for adding level-specific images.
+- **Updated Method**: 
+  - `addImagesToRoot()` is introduced to add the shield image to the root container.
+  - This ensures the shield image is added to the scene and displayed during gameplay.
+  - **Purpose**: To modularize the process of adding level-specific images, improving code structure and making it easier to modify the visual elements for level two.
+
+### **4. Show and Hide Shield Methods**
+- **Original Behavior**: There were no methods for showing or hiding the shield.
+- **Updated Behavior**:
+  - **showShield()**: Displays the shield image.
+  - **hideShield()**: Hides the shield image.
+- **Purpose**: To control the visibility of the shield during the gameplay, allowing for more dynamic interactions with the boss in level two.
+
+### **5. Debugging Output**
+- **Original Class**: No debugging output was present.
+- **Updated Class**: A `System.out.println("shield added")` line was added inside `addImagesToRoot()` for debugging purposes.
+- **Purpose**: To aid in troubleshooting and ensure that the shield image is being added to the scene as expected during development.
+
+
+## Additional Changes
+- **Class Refactoring**: The class is now more modular, with the addition of the `addImagesToRoot()` method that encapsulates the logic of adding level-specific visual elements.
+- **Error Handling**: No specific error handling changes were made, though the added debugging output provides more insight during development.
+# LevelOne Class
+
+## Overview
+The `LevelOne` class represents the first level in the game. It handles the initialization of the level, such as spawning enemies, managing the player's progress, checking for win/lose conditions, and transitioning to the next level when the kill target is met. The class was updated to enhance gameplay dynamics, improve functionality, and introduce new features like a kill count display.
+
+## Key Changes
+
+### **Package Declaration**
+- **Updated Package**: `com.example.demo.Levels`
+
+### **1. Background Image**
+- **Original Background Image**: `/com/example/demo/images/background1.jpg`
+- **Updated Background Image**: `/com/example/demo/images/background1.gif`
+- **Purpose**: The background image was changed from a static JPEG to an animated GIF to improve the visual experience for players.
+
+### **2. Total Enemies and Kill Target**
+- **Original Total Enemies**: `5`
+- **Updated Total Enemies**: `10`
+- **Purpose**: The number of enemies to spawn was increased to make the level more challenging.
+
+- **Original Kills to Advance**: `10`
+- **Updated Kills to Advance**: `7`
+- **Purpose**: The kill target was reduced, making it easier for players to advance to the next level.
+
+### **3. Enemy Spawn Probability**
+- **Original Spawn Probability**: `0.20`
+- **Updated Spawn Probability**: `0.05`
+- **Purpose**: The probability of spawning enemies was reduced to make the level less overwhelming, offering a more balanced difficulty curve.
+
+### **4. Player Initial Health**
+- **Original Player Health**: `5`
+- **Updated Player Health**: `5` (No change)
+- **Purpose**: Player health remains the same to maintain the initial difficulty level.
+
+### **5. Kill Count Display**
+- **New Feature**: A text element for displaying the player's kill count was added.
+- **Purpose**: To provide visual feedback on the player's progress, making it easier to track kills and advancement toward the next level.
+
+### **6. Game Over and Level Transition Logic**
+- **Original Logic**: The level transitioned based on the player's destruction or reaching the kill target.
+- **Updated Logic**:
+  - Improved `checkIfGameOver()` method to handle both the loss and win conditions more clearly.
+  - Added logic to prevent further updates after the level is marked as completed.
+  - **Purpose**: To prevent the level from being processed once it’s completed, ensuring that the game ends or transitions appropriately.
+
+### **7. Spawn Enemy Units Logic**
+- **Original Logic**: The number of enemies spawned was determined by the current number of enemies and the total enemy limit.
+- **Updated Logic**:
+  - Added checks to prevent overlapping enemy planes by calling `isEnemyPlaneOverlapping()` before adding a new enemy.
+  - The number of spawned enemies is dynamically adjusted based on the current number of enemies.
+  - **Purpose**: To prevent overlapping enemy planes, ensuring a smoother gameplay experience and avoiding visual bugs.
+
+### **8. LevelView Instantiation**
+- **Original**: `instantiateLevelView()` returned an instance of `LevelView`.
+- **Updated**: No change, still returns `LevelView`.
+- **Purpose**: To instantiate the view for the level and display the relevant game elements on the screen.
+
+### **9. Kill Count Text Initialization**
+- **New Feature**: The `initializeKillCountText()` method was introduced to initialize and style the kill counter text.
+  - Font: `Impact`, Size: `24`
+  - Color: Black with a white stroke for visibility
+  - Positioned at `(1200, 40)` on the screen
+- **Purpose**: To display the kill count text on the screen, providing real-time feedback to the player on their progress.
+
+### **10. Kill Count Update**
+- **Original**: No mechanism for updating the kill count.
+- **Updated**: The `updateKillCountText()` method updates the displayed kill count every time the scene is refreshed.
+- **Purpose**: To continuously update and display the player's kill count as they progress through the level.
+
+### **11. Update Scene Logic**
+- **Original**: `updateScene()` method exists but only calls the superclass method.
+- **Updated**: The `updateScene()` method now also calls `updateKillCountText()`, ensuring the kill count is updated every time the scene is rendered.
+- **Purpose**: To keep the kill count in sync with the gameplay.
+
+## Additional Changes
+- **Class Refactoring**: The class has been refactored to make the kill count handling and level transitions more efficient.
+- **Improved Enemy Handling**: The spawning logic was updated to ensure a balanced enemy appearance and prevent visual overlap.
+- **Enhanced Gameplay Experience**: By updating enemy spawn mechanics, player health, and kill targets, the difficulty curve of the game was adjusted to be more engaging.
+
+# Main Class
+
+## Overview
+The `Main` class serves as the entry point for the **Sky Battle** game. It is responsible for initializing the game window (stage), configuring its properties, and launching the game either by showing the main menu or directly launching the game. The class was refactored to improve organization, specifically for managing the main menu and game launch sequence.
+
+## Key Changes
+
+### **Package Declaration**
+- **Original Package**: `com.example.demo.controller`
+
+### **1. Launching the Game**
+- **Original**: The game is launched through a `Controller` object, which is responsible for invoking the game's start and handling game flow.
+- **Updated**: The game now directly shows the **MainMenu** by creating an instance of `MainMenu` and calling `showMenu()`.
+- **Purpose**: Refactor for clarity and maintain a cleaner entry point. Instead of handling game flow through the controller in `Main`, it now just initializes and displays the main menu.
+
+### **2. Stage Configuration**
+- **Original**: The `Controller` class was responsible for setting up the game window (stage).
+- **Updated**: The `Main` class now handles the stage configuration in the new `configureStage()` method.
+- **Purpose**: Simplifies stage configuration by consolidating the setup logic into one method, making it clearer and more manageable.
+
+### **3. Main Menu Handling**
+- **Original**: There was no direct handling of the main menu in the `Main` class.
+- **Updated**: A new method `showMainMenu()` was introduced. It creates a `MainMenu` object and calls `showMenu()` to display the menu on the screen.
+- **Purpose**: This change modularizes the handling of the main menu, making it separate from the stage configuration and game initialization.
+
+### **4. Game Launch Logic**
+- **Original**: The game is launched through `Controller`'s `launchGame()` method after the stage setup.
+- **Updated**: Game launch now focuses on showing the main menu first. The responsibility of launching the game is delegated to the `MainMenu` class.
+- **Purpose**: This ensures the main menu is shown to the player first, which can lead to better user interaction and control.
+
+### **5. Removed Reflection-Based Logic**
+- **Original**: The `start` method used reflection-based logic to initialize the `Controller`, including handling exceptions such as `ClassNotFoundException` and `InvocationTargetException`.
+- **Updated**: This reflection-based initialization was removed in favor of a more direct approach.
+- **Purpose**: Simplifies the code and removes unnecessary complexity associated with reflection, making the `start()` method easier to understand and maintain.
+
+## Additional Changes
+- **Class Refactoring**: The game flow and main menu handling were refactored into separate methods (`configureStage()` and `showMainMenu()`) to improve code modularity and readability.
+- **Game Launch**: The direct interaction with the `MainMenu` class improves the user experience by showing a clear entry point to the game.
+
+---
+# Pacakage Organization
+com/example/demo/ ├── actor/ │ ├── ActiveActor.java │ ├── ActiveActorDestructible.java │ ├── Boss.java │ ├── BossProjectile.java │ ├── EnemyPlane.java │ ├── EnemyProjectile.java │ ├── FighterPlane.java │ └── Projectile.java │ ├── controller/ │ └── Controller.java │ ├── levels/ │ ├── LevelOne.java │ ├── LevelParent.java │ ├── LevelTwo.java │ ├── LevelView.java │ └── LevelViewLevelTwo.java │ ├── ui/ │ ├── GameoverImage.java │ ├── HeartDisplay.java │ ├── MainMenu.java │ ├── PauseMenu.java │ ├── ShieldImage.java │ └── WinImage.java │ ├── user/ │ ├── UserPlane.java │ └── UserProjectile.java │ ├── Main.java └── Destructible.java
+
+## Unexpected Problems
+
+During the debugging and assignment period, I encountered an unexpected issue. After committing the changes to the repository, the file was somehow deleted from my laptop. When I tried to download it again from my repository, I discovered that it was the original, unchanged version of the file. This set me back significantly, as I had to start over from scratch.
+
+Despite trying various methods to resolve the issue and reaching out to my peers for help, it turned out to be a rather unusual situation. It was frustrating, but I eventually managed to recreate the missing work and push the necessary changes back to the repository.
+
+This experience made me more cautious moving forward. I began creating zip files for my progress to ensure I had local backups in case something like this happened again.
 
 
 
 
 
-
-
-
-
-
-
+  
