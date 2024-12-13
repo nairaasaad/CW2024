@@ -1,10 +1,11 @@
-package com.example.demo;
+package com.example.demo.Levels;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import User.UserPlane;
+import com.example.demo.Actor.FighterPlane;
+import com.example.demo.User.UserPlane;
 import com.example.demo.Actor.ActiveActorDestructible;
+import com.example.demo.UI.PauseMenu;
 import javafx.animation.*;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -207,6 +208,7 @@ public abstract class LevelParent extends Observable {
 			for (ActiveActorDestructible otherActor : actors1) {
 				if (otherActor.isDestroyed()) continue;
 				if (actor.getBoundsInParent().intersects(otherActor.getBoundsInParent())) {
+					System.out.println("a Collision has happened between the fighter plane and the projectile ");
 					actor.takeDamage();
 					otherActor.takeDamage();
 				}

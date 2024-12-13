@@ -1,7 +1,6 @@
-package level2;
+package com.example.demo.Actor;
 
-import com.example.demo.Actor.ActiveActorDestructible;
-import com.example.demo.FighterPlane;
+import com.example.demo.UI.ShieldImage;
 
 import java.util.*;
 
@@ -19,10 +18,11 @@ public class Boss extends FighterPlane {
 	private static final int ZERO = 0;
 	private static final int MAX_FRAMES_WITH_SAME_MOVE = 10;
 	private static final int Y_POSITION_UPPER_BOUND = -100;
-	private static final int Y_POSITION_LOWER_BOUND = 460;
+	private static final int Y_POSITION_LOWER_BOUND = 450;
 	private static final int MAX_FRAMES_WITH_SHIELD = 500;
 	private static final double BOSS_SHIELD_PROBABILITY = 0.005;
 	private static final int SHIELD_X_POSITION_OFFSET = 80;
+	private static final double SHIELD_DEACTIVATION_CHANCE = 0.001;
 
 	private final List<Integer> movePattern;
 	private final ShieldImage shieldImage;
@@ -84,21 +84,22 @@ public class Boss extends FighterPlane {
 	private void updateShield() {
 		if (isShielded) {
 			framesWithShieldActivated++;
-
-			if (Math.random() < 0.001) { // 0.1% chance to deactivate the shield
+			if (shouldDeactivateShield()) {
 				deactivateShield();
 			} else {
 				shieldImage.showShield();
 			}
-		} else {
-			if (shieldShouldBeActivated()) {
-				activateShield();
-			}
+		} else if (shieldShouldBeActivated()) {
+			activateShield();
 		}
 
 		if (framesWithShieldActivated >= MAX_FRAMES_WITH_SHIELD) {
 			deactivateShield();
 		}
+	}
+
+	private boolean shouldDeactivateShield() {
+		return Math.random() < SHIELD_DEACTIVATION_CHANCE;
 	}
 
 	private int getNextMove() {
